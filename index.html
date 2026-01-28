@@ -5,16 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>HAGo Server - 官方导航</title>
     <style>
-        /* ==========================================
-           在这里修改图片链接：
-           ========================================== */
         :root {
-            /* 背景图链接：建议使用 1920x1080 的光影截图 */
-            --bg-image: url('https://images.unsplash.com/photo-1627398242454-45a1465c2479?q=80&w=1920');
+            /* 电脑端随机横屏 API */
+            --bg-pc: url('https://img.072103.xyz/h');
+            /* 手机端随机竖屏 API */
+            --bg-mobile: url('https://img.072103.xyz/v');
             
-            /* 服务器图标链接：建议使用 256x256 的透明 PNG */
             --server-icon: url('https://www.minecraft.net/etc.clientlibs/minecraft/clientlibs/main/resources/favicon-96x96.png');
-
             --primary-color: #52a056;
             --secondary-color: #2e6b31;
             --bg-dark: #121212;
@@ -27,7 +24,16 @@
             background-color: var(--bg-dark);
             color: white;
             line-height: 1.6;
-            background: linear-gradient(rgba(0,0,0,0.8), rgba(0,0,0,0.8)), var(--bg-image) no-repeat center center/cover fixed;
+            /* 默认使用电脑背景 */
+            background: linear-gradient(rgba(0,0,0,0.65), rgba(0,0,0,0.65)), var(--bg-pc) no-repeat center center/cover fixed;
+            transition: background 0.5s ease;
+        }
+
+        /* 手机端适配：当屏幕宽度小于 768px 时切换背景 */
+        @media (max-width: 768px) {
+            body {
+                background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), var(--bg-mobile) no-repeat center center/cover fixed;
+            }
         }
 
         .main-wrapper {
@@ -35,9 +41,9 @@
             flex-direction: column;
             align-items: center;
             padding: 40px 20px;
+            min-height: 100vh;
         }
 
-        /* 顶部 Logo 样式 */
         .server-logo {
             width: 100px;
             height: 100px;
@@ -47,48 +53,44 @@
         }
 
         .container {
-            background: rgba(255, 255, 255, 0.05);
+            background: rgba(0, 0, 0, 0.65);
             padding: 30px;
             border-radius: 20px;
-            border: 1px solid rgba(82, 160, 86, 0.3);
+            border: 1px solid rgba(82, 160, 86, 0.4);
             box-shadow: 0 10px 30px rgba(0,0,0,0.5);
             max-width: 600px;
             width: 100%;
-            backdrop-filter: blur(15px);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
             margin-bottom: 30px;
         }
 
         h1 { color: var(--primary-color); font-size: 2.5rem; margin: 10px 0; text-align: center; }
         h2 { border-left: 4px solid var(--primary-color); padding-left: 15px; font-size: 1.2rem; margin-top: 30px; color: #fff; }
         
-        .days-counter {
-            color: var(--accent);
-            font-weight: bold;
-            font-size: 1.6rem;
-            text-shadow: 0 0 15px rgba(255, 206, 0, 0.5);
-        }
+        .days-counter { color: var(--accent); font-weight: bold; font-size: 1.6rem; text-shadow: 0 0 15px rgba(255, 206, 0, 0.5); }
 
         .address-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin: 20px 0; }
         .address-card {
-            background: rgba(255,255,255,0.08);
+            background: rgba(255,255,255,0.1);
             padding: 12px;
             border-radius: 12px;
-            border: 1px solid #444;
+            border: 1px solid rgba(255,255,255,0.1);
             cursor: pointer;
             transition: 0.3s;
             text-align: center;
         }
-        .address-card:hover { background: rgba(82, 160, 86, 0.2); border-color: var(--primary-color); transform: translateY(-3px); }
+        .address-card:hover { background: rgba(82, 160, 86, 0.25); border-color: var(--primary-color); transform: translateY(-3px); }
         .ip-value { font-family: monospace; color: var(--accent); font-size: 1rem; }
 
         .group-info {
-            background: rgba(0,0,0,0.3);
+            background: rgba(0,0,0,0.4);
             padding: 15px;
             border-radius: 10px;
             font-size: 0.85rem;
-            color: #bbb;
+            color: #ddd;
             white-space: pre-wrap;
-            border: 1px solid #333;
+            border: 1px solid #444;
         }
 
         .btn {
@@ -105,10 +107,11 @@
         }
         .btn:hover { background: #63bc68; box-shadow: 0 0 20px rgba(82, 160, 86, 0.4); }
 
-        footer { margin-top: 20px; color: #666; font-size: 0.8rem; text-align: center; }
+        footer { margin-top: auto; color: #aaa; font-size: 0.8rem; text-align: center; padding: 20px; }
 
         @media (max-width: 480px) {
             .address-grid { grid-template-columns: 1fr; }
+            h1 { font-size: 2rem; }
         }
     </style>
 </head>
@@ -119,58 +122,59 @@
         
         <div class="container">
             <h1>HAGo Server</h1>
-            <center><div style="background: var(--secondary-color); font-size: 0.8rem; padding: 2px 10px; border-radius: 5px; display: inline-block;">版本：1.18.x - 1.21.8</div></center>
+            <center><div style="background: var(--secondary-color); font-size: 0.8rem; padding: 2px 10px; border-radius: 5px; display: inline-block;">1.18.x - 1.21.8 | Java 离线服</div></center>
 
             <h2>服务器简介</h2>
-            <div style="color: #ccc; font-size: 0.95rem; text-align: justify;">
-                我们始于 2022 年 6 月 13 日，由一群热爱 MC 的少年共同创建，早期成员代表为<b>憨狗</b>。<br><br>
-                随着时间的推移，服务器得到了持续维护。从免费的简幻欢到阿里云，我们尝试了非常多的道路。我们迎难而上，只因热爱 MC。
+            <div style="color: #eee; font-size: 0.95rem; text-align: justify;">
+                我们始于 2022 年 6 月 13 日，由一群热爱 MC 的少年共同创建。经历多次更迭与挑战，我们始终迎难而上。只因热爱，所以坚持。
             </div>
             
-            <div style="text-align: center; margin: 25px 0; background: rgba(255,255,255,0.03); padding: 15px; border-radius: 15px;">
-                <div style="font-size: 0.9rem; color: #aaa; margin-bottom: 5px;">服务器已稳定运行</div>
+            <div style="text-align: center; margin: 25px 0; background: rgba(255,255,255,0.05); padding: 15px; border-radius: 15px; border: 1px solid rgba(255,255,255,0.1);">
+                <div style="font-size: 0.9rem; color: #bbb; margin-bottom: 5px;">服务器已稳定运行</div>
                 <span id="runtime-days" class="days-counter">...</span> <span style="color:var(--accent)">天</span>
             </div>
 
             <h2>连接地址 (点击复制)</h2>
             <div class="address-grid">
                 <div class="address-card" onclick="copyIP('mc.520pro.top')">
-                    <div style="font-size: 0.7rem; color: #888;">线路一</div>
+                    <div style="font-size: 0.7rem; color: #bbb;">线路一 (推荐)</div>
                     <div class="ip-value">mc.520pro.top</div>
                 </div>
                 <div class="address-card" onclick="copyIP('mc.qianxin520.xyz')">
-                    <div style="font-size: 0.7rem; color: #888;">线路二</div>
+                    <div style="font-size: 0.7rem; color: #bbb;">线路二</div>
                     <div class="ip-value">mc.qianxin520.xyz</div>
                 </div>
             </div>
 
             <h2>官方交流群</h2>
-            <div style="margin-bottom: 10px; font-weight: bold;">群号：<span style="color: var(--accent);">771976804</span></div>
+            <div style="margin-bottom: 10px;">群号：<span style="color: var(--accent); font-weight: bold;">771976804</span></div>
             <div class="group-info">HAGo 服务器 9 周目
 请将您的群昵称修改至：昵称(游戏名)
 关于服务器：kdocs.cn/l/cgWcf35aLjPg
-反馈：docs.qq.com/form/page/DTkpEZG5yVkpEc09i
 ------------------------------
-若问题在群内重复询问，说明未认真看公告！</div>
+反馈（外挂 / BUG / 建议）：
+docs.qq.com/form/page/DTkpEZG5yVkpEc09i</div>
 
             <a href="https://qm.qq.com/q/SFImYropqu" target="_blank" class="btn">立即加入 QQ 交流群</a>
         </div>
 
         <footer>
-            © 2022 - <span id="current-year"></span> HAGo Server
+            © 2022 - <span id="current-year"></span> HAGo Server | Powered by GitHub & Cloudflare
         </footer>
     </div>
 
     <script>
-        // 自动计算天数
+        // 自动计算运行天数
         const startDate = new Date('2022-06-13');
         const diffDays = Math.ceil(Math.abs(new Date() - startDate) / (1000 * 60 * 60 * 24));
         document.getElementById('runtime-days').innerText = diffDays;
         document.getElementById('current-year').innerText = new Date().getFullYear();
 
+        // 复制功能
         function copyIP(ip) {
             navigator.clipboard.writeText(ip).then(() => {
-                alert('地址已复制: ' + ip);
+                const originalText = event.currentTarget.querySelector('.ip-value').innerText;
+                alert('地址已复制: ' + ip + '\n请在游戏中添加服务器！');
             });
         }
     </script>
