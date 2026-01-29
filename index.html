@@ -2,181 +2,382 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HAGo Server - 官方导航</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>HAGo Server | 官方导航</title>
     <style>
         :root {
-            /* 电脑端随机横屏 API */
-            --bg-pc: url('https://img.072103.xyz/h');
-            /* 手机端随机竖屏 API */
-            --bg-mobile: url('https://img.072103.xyz/v');
-            
-            --server-icon: url('https://www.minecraft.net/etc.clientlibs/minecraft/clientlibs/main/resources/favicon-96x96.png');
-            --primary-color: #52a056;
-            --secondary-color: #2e6b31;
-            --bg-dark: #121212;
-            --accent: #ffce00;
+            --server-icon-url: url('https://raw.githubusercontent.com/ERX399/HAGo-Server/main/server.png');
+            --dynamic-bg: url('https://eopfapi.acofork.com/pic?img=ua');
+            --primary-blue: #4d8fe6;
+            --btn-blue: #5b9cf0;
+            --text-dark: #f5f5f5;
+            --accent-yellow: #f6b93b;
+            --global-bg: rgba(255, 255, 255, 0.1);
+            --box-bg: rgba(255, 255, 255, 0.08);
+            --bg-overlay: rgba(0, 0, 0, 0.5);
+            --border-color: rgba(255, 255, 255, 0.15);
+            --shadow-color: rgba(0, 0, 0, 0.2);
         }
 
-        body {
-            margin: 0;
-            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
-            background-color: var(--bg-dark);
-            color: white;
-            line-height: 1.6;
-            /* 默认使用电脑背景 */
-            background: linear-gradient(rgba(0,0,0,0.65), rgba(0,0,0,0.65)), var(--bg-pc) no-repeat center center/cover fixed;
-            transition: background 0.5s ease;
+        html, body { 
+            height: 100%; 
+            margin: 0; 
+            overflow-x: hidden;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
         }
-
-        /* 手机端适配：当屏幕宽度小于 768px 时切换背景 */
-        @media (max-width: 768px) {
-            body {
-                background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), var(--bg-mobile) no-repeat center center/cover fixed;
-            }
-        }
-
-        .main-wrapper {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 40px 20px;
-            min-height: 100vh;
-        }
-
-        .server-logo {
-            width: 100px;
-            height: 100px;
-            background: var(--server-icon) no-repeat center/contain;
-            margin-bottom: 15px;
-            filter: drop-shadow(0 0 10px rgba(82, 160, 86, 0.5));
-        }
-
-        .container {
-            background: rgba(0, 0, 0, 0.65);
-            padding: 30px;
-            border-radius: 20px;
-            border: 1px solid rgba(82, 160, 86, 0.4);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            max-width: 600px;
-            width: 100%;
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            margin-bottom: 30px;
-        }
-
-        h1 { color: var(--primary-color); font-size: 2.5rem; margin: 10px 0; text-align: center; }
-        h2 { border-left: 4px solid var(--primary-color); padding-left: 15px; font-size: 1.2rem; margin-top: 30px; color: #fff; }
         
-        .days-counter { color: var(--accent); font-weight: bold; font-size: 1.6rem; text-shadow: 0 0 15px rgba(255, 206, 0, 0.5); }
-
-        .address-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin: 20px 0; }
-        .address-card {
-            background: rgba(255,255,255,0.1);
-            padding: 12px;
-            border-radius: 12px;
-            border: 1px solid rgba(255,255,255,0.1);
-            cursor: pointer;
-            transition: 0.3s;
+        body { 
+            min-height: 100vh; 
+            color: var(--text-dark); 
+            background-image: var(--dynamic-bg);
+            background-size: cover; 
+            background-position: center; 
+            background-attachment: fixed;
+            background-repeat: no-repeat;
             text-align: center;
+            position: relative;
         }
-        .address-card:hover { background: rgba(82, 160, 86, 0.25); border-color: var(--primary-color); transform: translateY(-3px); }
-        .ip-value { font-family: monospace; color: var(--accent); font-size: 1rem; }
+        
+        .bg-container {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-image: var(--dynamic-bg);
+            background-size: cover; background-position: center; background-attachment: fixed;
+            z-index: -3;
+        }
+        
+        .bg-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: -1;
+            transition: background-color 0.8s ease;
+        }
+        
+        .hide-ui .bg-overlay { background: rgba(0, 0, 0, 0.3); }
 
-        .group-info {
-            background: rgba(0,0,0,0.4);
-            padding: 15px;
-            border-radius: 10px;
-            font-size: 0.85rem;
-            color: #ddd;
-            white-space: pre-wrap;
-            border: 1px solid #444;
+        .ui-element { 
+            transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1), transform 0.8s ease;
+            opacity: 1;
         }
 
-        .btn {
-            background: var(--primary-color);
-            color: white;
-            padding: 15px;
-            text-decoration: none;
-            border-radius: 10px;
-            font-weight: bold;
-            display: block;
-            text-align: center;
-            margin-top: 20px;
-            transition: 0.3s;
+        .hide-ui .ui-element { 
+            opacity: 0;
+            pointer-events: none;
+            transform: scale(0.98);
         }
-        .btn:hover { background: #63bc68; box-shadow: 0 0 20px rgba(82, 160, 86, 0.4); }
 
-        footer { margin-top: auto; color: #aaa; font-size: 0.8rem; text-align: center; padding: 20px; }
+        .wrapper { 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            padding: 60px 18px 40px; 
+            box-sizing: border-box;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .hide-btn { 
+            position: fixed; top: 20px; right: 20px; z-index: 10001; 
+            background: rgba(255, 255, 255, 0.1); 
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px; padding: 8px; cursor: pointer; 
+            width: 36px; height: 36px; display: flex; align-items: center; justify-content: center;
+        }
+        .hide-btn svg { width: 20px; height: 20px; fill: #fff; opacity: 0.8; }
+
+        /* 播放器 */
+        #player {
+            position: fixed; bottom: 100px; right: 20px; 
+            width: 46px; height: 46px; 
+            background: rgba(255, 255, 255, 0.15) !important;
+            backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.2); 
+            border-radius: 23px; z-index: 9999; 
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+            transition: width 0.5s cubic-bezier(0.16, 1, 0.3, 1), height 0.3s, opacity 0.8s ease, bottom 0.3s ease;
+        }
+        #player.expanded { width: 320px; height: 60px; border-radius: 16px; }
+        .player-content { display: flex; align-items: center; height: 100%; width: 100%; }
+        .cd-box { width: 46px; height: 46px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; cursor: pointer; }
+        .cd-box svg { width: 20px; height: 20px; fill: #fff; }
+        .inner-ctrl { flex: 1; display: flex; flex-direction: column; padding-right: 12px; opacity: 0; pointer-events: none; text-align: left; }
+        #player.expanded .inner-ctrl { opacity: 1; pointer-events: auto; transition: opacity 0.3s ease 0.2s; }
+        .m-title { font-size: 13px; color: #fff; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .m-time { font-size: 10px; color: rgba(255, 255, 255, 0.7); font-family: monospace; }
+        .ctrl-btns { display: flex; align-items: center; gap: 8px; }
+        .ctrl-btns button { background: none; border: none; cursor: pointer; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; }
+        .ctrl-btns button svg { width: 18px; height: 18px; fill: #fff; opacity: 0.8; }
+        .p-bg { flex: 1; height: 3px; background: rgba(255, 255, 255, 0.2); border-radius: 2px; cursor: pointer; margin-left: 8px; position: relative; }
+        .p-fill { height: 100%; background: #fff; width: 0%; border-radius: 2px; }
+
+        /* 内容卡片 */
+        .server-icon { 
+            width: 90px; height: 90px; border-radius: 20px; margin-bottom: 20px; 
+            border: 2px solid rgba(255, 255, 255, 0.25); background-size: cover; 
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3); background-color: rgba(255, 255, 255, 0.1);
+        }
+        
+        h1 { margin: 0 0 5px 0; font-size: 2.2rem; font-weight: 800; color: #fff; text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5); }
+        
+        .version-info { 
+            font-size: 0.85rem; margin: 0 0 25px 0; 
+            color: rgba(255, 255, 255, 0.9); /* 移除特定颜色 */
+            font-weight: 600; padding: 8px 16px;
+            background: rgba(255, 255, 255, 0.1); border-radius: 12px; display: inline-block;
+        }
+        
+        .card { 
+            background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.15); 
+            border-radius: 18px; padding: 20px; margin-bottom: 18px; width: 100%; max-width: 440px; box-sizing: border-box;
+        }
+        
+        h2 { 
+            font-size: 1.05rem; margin: 0 0 18px; color: #fff; 
+            display: flex; align-items: center; justify-content: center; gap: 10px; 
+        }
+        h2::before, h2::after { content: ""; width: 20px; height: 1px; background: rgba(255, 255, 255, 0.3); }
+
+        .addr-box { 
+            background: rgba(255, 255, 255, 0.08); padding: 16px; border-radius: 14px; 
+            cursor: pointer; margin-bottom: 12px; border: 1px solid rgba(255, 255, 255, 0.12);
+        }
+        .addr-box span { 
+            font-size: 0.8rem; opacity: 0.6; display: block; margin-bottom: 4px; 
+            color: #fff; /* 移除特定颜色 */
+        }
+        .addr-box strong { color: var(--accent-yellow); font-family: monospace; font-size: 1.2rem; }
+
+        .comm-row { 
+            display: flex; justify-content: space-between; align-items: center; 
+            background: rgba(255, 255, 255, 0.08); padding: 14px 16px; border-radius: 14px; 
+            color: inherit; margin-bottom: 8px; font-size: 0.9rem; border: 1px solid rgba(255, 255, 255, 0.12);
+        }
+        
+        .btn-join { 
+            background: linear-gradient(135deg, rgba(107, 164, 255, 0.9), rgba(90, 141, 233, 0.9)); 
+            color: #fff; padding: 16px; border-radius: 18px; display: block; font-weight: 700; margin-top: 10px;
+        }
+
+        .disclaimer { 
+            background: rgba(255, 255, 255, 0.05); border-left: 4px solid var(--primary-blue); 
+            padding: 15px; text-align: left; border-radius: 8px; margin-bottom: 20px; font-size: 0.75rem;
+        }
+
+        #timer { 
+            color: var(--accent-yellow); font-weight: 600; font-size: 1.1rem; 
+            padding: 10px 16px; background: rgba(246, 185, 59, 0.1); border-radius: 12px; display: inline-block; margin-bottom: 20px;
+        }
+        
+        /* 底部 CDN 排版优化 */
+        .footer-info { 
+            font-size: 0.7rem; color: rgba(255, 255, 255, 0.5);
+            border-top: 1px solid rgba(255, 255, 255, 0.1); padding: 20px 0;
+            line-height: 1.6;
+        }
+        .cdn-container {
+            margin-top: 10px; display: flex; flex-direction: column; gap: 4px;
+        }
+        .cdn-title { font-weight: bold; color: rgba(255, 255, 255, 0.7); margin-bottom: 2px; }
+
+        #toast { 
+            visibility: hidden; position: fixed; top: 60px; left: 50%; transform: translateX(-50%); 
+            background: rgba(0, 0, 0, 0.8); color: #fff; padding: 10px 20px; border-radius: 10px; z-index: 10000;
+        }
+        #toast.show { visibility: visible; animation: fadeInOut 1.5s; }
+        
+        @keyframes fadeInOut {
+            0%, 100% { opacity: 0; transform: translateX(-50%) translateY(-10px); }
+            20%, 80% { opacity: 1; transform: translateX(-50%) translateY(0); }
+        }
 
         @media (max-width: 480px) {
-            .address-grid { grid-template-columns: 1fr; }
-            h1 { font-size: 2rem; }
+            #player { bottom: 80px; }
+            h1 { font-size: 1.8rem; }
         }
     </style>
 </head>
-<body>
+<body id="mainBody">
 
-    <div class="main-wrapper">
-        <div class="server-logo"></div>
-        
-        <div class="container">
-            <h1>HAGo Server</h1>
-            <center><div style="background: var(--secondary-color); font-size: 0.8rem; padding: 2px 10px; border-radius: 5px; display: inline-block;">1.18.x - 1.21.8 | Java 离线服</div></center>
+<div class="bg-container"></div>
+<div class="bg-overlay"></div>
+<div id="toast">已复制</div>
 
-            <h2>服务器简介</h2>
-            <div style="color: #eee; font-size: 0.95rem; text-align: justify;">
-                我们始于 2022 年 6 月 13 日，由一群热爱 MC 的少年共同创建。经历多次更迭与挑战，我们始终迎难而上。只因热爱，所以坚持。
-            </div>
-            
-            <div style="text-align: center; margin: 25px 0; background: rgba(255,255,255,0.05); padding: 15px; border-radius: 15px; border: 1px solid rgba(255,255,255,0.1);">
-                <div style="font-size: 0.9rem; color: #bbb; margin-bottom: 5px;">服务器已稳定运行</div>
-                <span id="runtime-days" class="days-counter">...</span> <span style="color:var(--accent)">天</span>
-            </div>
+<button class="hide-btn" onclick="toggleUI()">
+    <svg viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
+</button>
 
-            <h2>连接地址 (点击复制)</h2>
-            <div class="address-grid">
-                <div class="address-card" onclick="copyIP('mc.520pro.top')">
-                    <div style="font-size: 0.7rem; color: #bbb;">线路一 (推荐)</div>
-                    <div class="ip-value">mc.520pro.top</div>
-                </div>
-                <div class="address-card" onclick="copyIP('mc.qianxin520.xyz')">
-                    <div style="font-size: 0.7rem; color: #bbb;">线路二</div>
-                    <div class="ip-value">mc.qianxin520.xyz</div>
-                </div>
-            </div>
-
-            <h2>官方交流群</h2>
-            <div style="margin-bottom: 10px;">群号：<span style="color: var(--accent); font-weight: bold;">771976804</span></div>
-            <div class="group-info">HAGo 服务器 9 周目
-请将您的群昵称修改至：昵称(游戏名)
-关于服务器：kdocs.cn/l/cgWcf35aLjPg
-------------------------------
-反馈（外挂 / BUG / 建议）：
-docs.qq.com/form/page/DTkpEZG5yVkpEc09i</div>
-
-            <a href="https://qm.qq.com/q/SFImYropqu" target="_blank" class="btn">立即加入 QQ 交流群</a>
+<div id="player" class="ui-element">
+    <div class="player-content">
+        <div class="cd-box" onclick="toggleDrawer()">
+            <svg viewBox="0 0 24 24"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>
         </div>
+        <div class="inner-ctrl">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+                <span class="m-title" id="mName">载入中...</span>
+                <span class="m-time"><span id="cTime">00:00</span> / <span id="tTime">00:00</span></span>
+            </div>
+            <div style="display:flex; align-items:center;">
+                <div class="ctrl-btns">
+                    <button onclick="prevTrack()"><svg viewBox="0 0 24 24"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg></button>
+                    <button onclick="toggleMusic()">
+                        <svg id="playIco" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                        <svg id="pauseIco" style="display:none;" viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+                    </button>
+                    <button onclick="nextTrack()"><svg viewBox="0 0 24 24"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg></button>
+                </div>
+                <div class="p-bg" onclick="seek(event)" id="pWrap"><div class="p-fill" id="pBar"></div></div>
+            </div>
+        </div>
+    </div>
+    <audio id="audio"></audio>
+</div>
 
-        <footer>
-            © 2022 - <span id="current-year"></span> HAGo Server | Powered by GitHub & Cloudflare
-        </footer>
+<div class="wrapper ui-element">
+    <div class="server-icon" style="background-image: var(--server-icon-url);"></div>
+    <h1>HAGo Server</h1>
+    <div class="version-info">9 周目 | 1.18.x - 1.21.x | Java 离线服</div>
+
+    <div class="card">
+        <h2>关于我们</h2>
+        <p style="margin:0; font-size:0.95rem; line-height: 1.7; opacity: 0.9;">始于 2022 年 6 月 13 日 <br> 由热爱 MC 的少年共同创建<br> 目前已开启 9 周目 欢迎加入</p>
     </div>
 
-    <script>
-        // 自动计算运行天数
-        const startDate = new Date('2022-06-13');
-        const diffDays = Math.ceil(Math.abs(new Date() - startDate) / (1000 * 60 * 60 * 24));
-        document.getElementById('runtime-days').innerText = diffDays;
-        document.getElementById('current-year').innerText = new Date().getFullYear();
+    <div class="card">
+        <h2>连接地址</h2>
+        <div class="addr-box" onclick="copy('mc.qianxin520.xyz')">
+            <span>主线路</span>
+            <strong>mc.qianxin520.xyz</strong>
+        </div>
+        <div class="addr-box" onclick="copy('mc.520pro.top')">
+            <span>副线路</span>
+            <strong>mc.520pro.top</strong>
+        </div>
+    </div>
 
-        // 复制功能
-        function copyIP(ip) {
-            navigator.clipboard.writeText(ip).then(() => {
-                const originalText = event.currentTarget.querySelector('.ip-value').innerText;
-                alert('地址已复制: ' + ip + '\n请在游戏中添加服务器！');
-            });
+    <div class="card">
+        <h2>官方社区</h2>
+        <div class="comm-list">
+            <div class="comm-row"><span>官方 QQ 交流群</span><span style="color:var(--accent-yellow); font-weight:600;">771976804</span></div>
+            <a href="https://kdocs.cn/l/cgWcf35aLjPg" target="_blank" class="comm-row"><span>服务器详细文档</span><span>点击跳转</span></a>
+        </div>
+        <a href="https://qm.qq.com/q/SFImYropqu" class="btn-join" target="_blank">立即加入 QQ 群聊</a>
+    </div>
+
+    <footer>
+        <div class="disclaimer">
+            <strong style="display:block;margin-bottom:5px;">免责声明 / DISCLAIMER</strong>
+            <p style="margin:0;line-height:1.4;">本页面背景图由第三方接口随机生成，展示内容不代表本站立场。如遇不适内容请刷新页面。</p>
+        </div>
+        <div id="timer">00 天 00 时 00 分 00 秒</div>
+        
+        <div class="footer-info">
+            <div>Powered by GitHub & Acofork API</div>
+            <div class="cdn-container">
+                <div class="cdn-title">CDN 提供商</div>
+                <div>Alibaba Cloud ESA / Cloudflare</div>
+                <div>Tencent Cloud EdgeOne</div>
+            </div>
+            <div style="margin-top:10px; opacity:0.3;">© 2022-2026 HAGo Server Team</div>
+        </div>
+    </footer>
+</div>
+
+<script>
+    // 基础控制
+    function toggleUI() { document.body.classList.toggle('hide-ui'); }
+    function toggleDrawer() { document.getElementById("player").classList.toggle('expanded'); }
+
+    // 播放器逻辑
+    const playlist = [
+        { name: "雨爱", url: "https://raw.githubusercontent.com/ERX399/HAGo-Server/main/%E9%9F%B3%E4%B9%90/%E9%9B%A8%E7%88%B1.mp3" },
+        { name: "星茶会", url: "https://raw.githubusercontent.com/ERX399/HAGo-Server/main/%E9%9F%B3%E4%B9%90/%E6%98%9F%E8%8C%B6%E4%BC%9A.mp3" },
+        { name: "带我走", url: "https://raw.githubusercontent.com/ERX399/HAGo-Server/main/%E9%9F%B3%E4%B9%90/%E5%B8%A6%E6%88%91%E8%B5%B0.mp3" }
+    ];
+    let currentIndex = Math.floor(Math.random() * playlist.length);
+    const audio = document.getElementById("audio");
+    const mName = document.getElementById("mName");
+    let isPlaying = false;
+
+    function loadTrack(idx) {
+        currentIndex = (idx + playlist.length) % playlist.length;
+        audio.src = playlist[currentIndex].url;
+        mName.innerText = playlist[currentIndex].name;
+    }
+
+    function toggleMusic() {
+        if (!audio.src) loadTrack(currentIndex);
+        if (audio.paused) {
+            audio.play().then(() => { updateIco(true); isPlaying = true; });
+        } else {
+            audio.pause(); updateIco(false); isPlaying = false;
         }
-    </script>
+    }
+
+    function nextTrack() { loadTrack(currentIndex + 1); if(isPlaying) audio.play(); }
+    function prevTrack() { loadTrack(currentIndex - 1); if(isPlaying) audio.play(); }
+    function updateIco(p) {
+        document.getElementById('playIco').style.display = p ? 'none' : 'block';
+        document.getElementById('pauseIco').style.display = p ? 'block' : 'none';
+    }
+
+    audio.ontimeupdate = () => {
+        if (audio.duration) {
+            const cur = audio.currentTime, dur = audio.duration;
+            document.getElementById('pBar').style.width = (cur/dur*100) + "%";
+            document.getElementById('cTime').innerText = fmtT(cur);
+            document.getElementById('tTime').innerText = fmtT(dur);
+        }
+    };
+    audio.onended = () => nextTrack();
+    const fmtT = (s) => {
+        let m = Math.floor(s/60), sec = Math.floor(s%60);
+        return (m<10?"0"+m:m)+":"+(sec<10?"0"+sec:sec);
+    };
+    function seek(e) {
+        const rect = document.getElementById('pWrap').getBoundingClientRect();
+        audio.currentTime = ((e.clientX - rect.left) / rect.width) * audio.duration;
+    }
+
+    // 运行时间
+    function updateTimer() {
+        const start = new Date('2022-06-13T00:00:00').getTime();
+        const now = new Date().getTime();
+        const diff = now - start;
+        const d = Math.floor(diff / 86400000);
+        const h = Math.floor((diff % 86400000) / 3600000);
+        const m = Math.floor((diff % 3600000) / 60000);
+        const s = Math.floor((diff % 60000) / 1000);
+        document.getElementById('timer').innerText = `${d} 天 ${h<10?'0'+h:h} 时 ${m<10?'0'+m:m} 分 ${s<10?'0'+s:s} 秒`;
+    }
+    setInterval(updateTimer, 1000);
+
+    // 复制功能
+    function copy(t) {
+        navigator.clipboard.writeText(t).then(() => {
+            const toast = document.getElementById('toast');
+            toast.textContent = '已复制: ' + t;
+            toast.className = 'show';
+            setTimeout(() => toast.className = '', 1500);
+        });
+    }
+
+    // 适配与初始化
+    function adjustPlayerPosition() {
+        const p = document.getElementById('player');
+        p.style.bottom = window.innerHeight < 700 ? "80px" : "100px";
+    }
+
+    window.onload = () => {
+        loadTrack(currentIndex);
+        updateTimer();
+        adjustPlayerPosition();
+    };
+    window.onresize = adjustPlayerPosition;
+    document.addEventListener('click', (e) => {
+        const p = document.getElementById('player');
+        if (!p.contains(e.target)) p.classList.remove('expanded');
+    });
+</script>
 </body>
 </html>
