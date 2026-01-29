@@ -8,353 +8,693 @@
         :root {
             --server-icon-url: url('https://raw.githubusercontent.com/ERX399/HAGo-Server/main/server.png');
             --dynamic-bg: url('https://eopfapi.acofork.com/pic?img=ua');
-            --primary-blue: #4d8fe6;
-            --btn-blue: #5b9cf0;
-            --text-dark: #f5f5f5;
             --accent-yellow: #f6b93b;
-            --global-bg: rgba(255, 255, 255, 0.1);
-            --box-bg: rgba(255, 255, 255, 0.08);
-            --bg-overlay: rgba(0, 0, 0, 0.5);
-            --border-color: rgba(255, 255, 255, 0.15);
-            --shadow-color: rgba(0, 0, 0, 0.2);
+            --light-blue: #a0d2ff;
+            --text-white: rgba(255, 255, 255, 0.95);
+            --footer-gray: rgba(255, 255, 255, 0.4); 
+            --glass-bg: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.15);
+            --card-bg: var(--glass-bg);
         }
 
         html, body { 
             height: 100%; 
             margin: 0; 
-            overflow-x: hidden;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            overflow-x: hidden; 
+            font-family: -apple-system, sans-serif; 
+            overflow-y: auto; /* 允许垂直滚动 */
+        }
+        
+        /* 背景锁定解决方案 */
+        .background-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+            overflow: hidden;
+        }
+        
+        .background-container::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: var(--dynamic-bg);
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed; /* 锁定背景图 */
+            will-change: transform; /* 优化性能 */
         }
         
         body { 
             min-height: 100vh; 
-            color: var(--text-dark); 
-            background-image: var(--dynamic-bg);
-            background-size: cover; 
-            background-position: center; 
-            background-attachment: fixed;
-            background-repeat: no-repeat;
-            text-align: center;
+            color: var(--text-white); 
+            text-align: center; 
             position: relative;
+            z-index: 1;
         }
         
-        .bg-container {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background-image: var(--dynamic-bg);
-            background-size: cover; background-position: center; background-attachment: fixed;
-            z-index: -3;
+        .bg-overlay { 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%; 
+            background: rgba(0, 0, 0, 0.6); 
+            z-index: -1; 
+            transition: background 0.8s ease; 
         }
-        
-        .bg-overlay {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.6);
-            z-index: -1;
-            transition: background-color 0.8s ease;
-        }
-        
-        .hide-ui .bg-overlay { background: rgba(0, 0, 0, 0.3); }
+        .hide-ui .bg-overlay { background: rgba(0, 0, 0, 0.05); } 
 
         .ui-element { 
-            transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1), transform 0.8s ease;
-            opacity: 1;
+            transition: opacity 0.6s ease, transform 0.6s ease; 
+            opacity: 1; 
         }
-
         .hide-ui .ui-element { 
-            opacity: 0;
-            pointer-events: none;
-            transform: scale(0.98);
+            opacity: 0; 
+            pointer-events: none; 
+            transform: translateY(15px); 
         }
 
         .wrapper { 
             display: flex; 
             flex-direction: column; 
             align-items: center; 
-            padding: 60px 18px 40px; 
-            box-sizing: border-box;
-            max-width: 500px;
-            margin: 0 auto;
+            padding: 50px 18px 100px; 
+            box-sizing: border-box; 
+            max-width: 500px; 
+            margin: 0 auto; 
+            position: relative;
+            z-index: 2;
         }
+        a { text-decoration: none; color: inherit; }
 
         .hide-btn { 
-            position: fixed; top: 20px; right: 20px; z-index: 10001; 
+            position: fixed; 
+            top: 20px; 
+            right: 20px; 
+            z-index: 10001; 
             background: rgba(255, 255, 255, 0.1); 
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 10px; padding: 8px; cursor: pointer; 
-            width: 36px; height: 36px; display: flex; align-items: center; justify-content: center;
+            border: 1px solid var(--glass-border); 
+            border-radius: 10px; 
+            width: 38px; 
+            height: 38px; 
+            cursor: pointer; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            backdrop-filter: blur(5px); 
         }
-        .hide-btn svg { width: 20px; height: 20px; fill: #fff; opacity: 0.8; }
+        .hide-btn svg { width: 20px; height: 20px; fill: #fff; }
 
-        /* 播放器 */
-        #player {
-            position: fixed; bottom: 100px; right: 20px; 
-            width: 46px; height: 46px; 
-            background: rgba(255, 255, 255, 0.15) !important;
-            backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px);
-            border: 1px solid rgba(255, 255, 255, 0.2); 
-            border-radius: 23px; z-index: 9999; 
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
-            transition: width 0.5s cubic-bezier(0.16, 1, 0.3, 1), height 0.3s, opacity 0.8s ease, bottom 0.3s ease;
+        /* --- 播放器 --- */
+        #player { 
+            position: fixed; 
+            bottom: 20px; 
+            right: 20px; 
+            width: 50px; 
+            height: 50px; 
+            background: rgba(255, 255, 255, 0.15); 
+            border: 1px solid var(--glass-border); 
+            border-radius: 25px; 
+            z-index: 9999; 
+            backdrop-filter: blur(12px); 
+            -webkit-backdrop-filter: blur(12px); 
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+            overflow: hidden; 
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
         }
-        #player.expanded { width: 320px; height: 60px; border-radius: 16px; }
-        .player-content { display: flex; align-items: center; height: 100%; width: 100%; }
-        .cd-box { width: 46px; height: 46px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; cursor: pointer; }
-        .cd-box svg { width: 20px; height: 20px; fill: #fff; }
-        .inner-ctrl { flex: 1; display: flex; flex-direction: column; padding-right: 12px; opacity: 0; pointer-events: none; text-align: left; }
-        #player.expanded .inner-ctrl { opacity: 1; pointer-events: auto; transition: opacity 0.3s ease 0.2s; }
-        .m-title { font-size: 13px; color: #fff; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .m-time { font-size: 10px; color: rgba(255, 255, 255, 0.7); font-family: monospace; }
-        .ctrl-btns { display: flex; align-items: center; gap: 8px; }
-        .ctrl-btns button { background: none; border: none; cursor: pointer; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; }
-        .ctrl-btns button svg { width: 18px; height: 18px; fill: #fff; opacity: 0.8; }
-        .p-bg { flex: 1; height: 3px; background: rgba(255, 255, 255, 0.2); border-radius: 2px; cursor: pointer; margin-left: 8px; position: relative; }
-        .p-fill { height: 100%; background: #fff; width: 0%; border-radius: 2px; }
+        #player.expanded { 
+            width: 300px; 
+            height: 130px; 
+            border-radius: 20px; 
+            padding: 15px; 
+            box-sizing: border-box; 
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        
+        .cd-box { 
+            width: 50px; 
+            height: 50px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            cursor: pointer; 
+            position: absolute; 
+            top: 0; 
+            left: 0; 
+            z-index: 2;
+        }
+        .cd-box svg { width: 22px; height: 22px; fill: #fff; }
 
-        /* 内容卡片 */
+        .inner-ui { 
+            opacity: 0; 
+            pointer-events: none; 
+            transition: opacity 0.3s ease; 
+            height: 100%; 
+            display: flex; 
+            flex-direction: column; 
+            justify-content: space-between; 
+        }
+        #player.expanded .inner-ui { 
+            opacity: 1; 
+            pointer-events: auto; 
+        }
+        
+        .m-info { 
+            text-align: center; 
+            padding: 0 5px; 
+        }
+        .m-title { 
+            font-size: 14px; 
+            color: #fff; 
+            font-weight: bold; 
+            white-space: nowrap; 
+            overflow: hidden; 
+            text-overflow: ellipsis; 
+            display: block; 
+            margin-bottom: 8px; 
+        }
+        
+        .progress-container { 
+            width: 100%; 
+            height: 20px; 
+            display: flex; 
+            align-items: center; 
+            cursor: pointer; 
+        }
+        .p-bg { 
+            width: 100%; 
+            height: 4px; 
+            background: rgba(255, 255, 255, 0.2); 
+            border-radius: 2px; 
+            position: relative; 
+        }
+        .p-fill { 
+            height: 100%; 
+            background: var(--light-blue); 
+            width: 0%; 
+            border-radius: 2px; 
+            position: relative; 
+        }
+        .p-fill::after { 
+            content: ''; 
+            position: absolute; 
+            right: -5px; 
+            top: -3px; 
+            width: 8px; 
+            height: 8px; 
+            background: #fff; 
+            border-radius: 50%; 
+            box-shadow: 0 0 4px rgba(0,0,0,0.3); 
+            transform: scale(0); 
+            transition: transform 0.2s; 
+        }
+        #player.expanded .p-fill::after { transform: scale(1); }
+
+        .ctrl-row { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+        }
+        .ctrl-btns { 
+            display: flex; 
+            gap: 12px; 
+            align-items: center; 
+        }
+        .ctrl-btns button { 
+            background: rgba(255,255,255,0.1); 
+            border: none; 
+            cursor: pointer; 
+            padding: 6px; 
+            border-radius: 50%; 
+            display: flex; 
+            transition: transform 0.1s, background 0.2s; 
+        }
+        .ctrl-btns button:active { transform: scale(0.92); }
+        .ctrl-btns svg { 
+            width: 18px; 
+            height: 18px; 
+            fill: #fff; 
+        }
+        .m-time { 
+            font-size: 10px; 
+            color: var(--light-blue); 
+            font-family: monospace; 
+            min-width: 70px; 
+            text-align: right;
+        }
+
+        /* --- 业务内容 --- */
         .server-icon { 
-            width: 90px; height: 90px; border-radius: 20px; margin-bottom: 20px; 
-            border: 2px solid rgba(255, 255, 255, 0.25); background-size: cover; 
-            box-shadow: 0 8px 25px rgba(0,0,0,0.3); background-color: rgba(255, 255, 255, 0.1);
+            width: 85px; 
+            height: 85px; 
+            border-radius: 22px; 
+            margin-bottom: 15px; 
+            border: 2px solid var(--glass-border); 
+            background-image: var(--server-icon-url); 
+            background-size: cover; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3); 
         }
-        
-        h1 { margin: 0 0 5px 0; font-size: 2.2rem; font-weight: 800; color: #fff; text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5); }
-        
+        h1 { 
+            font-size: 2rem; 
+            margin: 0; 
+            text-shadow: 0 2px 10px rgba(0,0,0,0.5); 
+        }
         .version-info { 
-            font-size: 0.85rem; margin: 0 0 25px 0; 
-            color: rgba(255, 255, 255, 0.9); /* 移除特定颜色 */
-            font-weight: 600; padding: 8px 16px;
-            background: rgba(255, 255, 255, 0.1); border-radius: 12px; display: inline-block;
+            font-size: 0.85rem; 
+            margin: 10px 0 25px; 
+            padding: 6px 15px; 
+            background: var(--card-bg); 
+            border: 1px solid var(--glass-border); 
+            border-radius: 12px; 
+            color: var(--light-blue); 
+            font-weight: bold; 
         }
-        
+
         .card { 
-            background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.15); 
-            border-radius: 18px; padding: 20px; margin-bottom: 18px; width: 100%; max-width: 440px; box-sizing: border-box;
+            background: var(--card-bg); 
+            border: 1px solid var(--glass-border); 
+            border-radius: 18px; 
+            padding: 20px; 
+            margin-bottom: 15px; 
+            width: 100%; 
+            max-width: 420px; 
+            box-sizing: border-box; 
         }
         
         h2 { 
-            font-size: 1.05rem; margin: 0 0 18px; color: #fff; 
-            display: flex; align-items: center; justify-content: center; gap: 10px; 
+            font-size: 1.05rem; 
+            color: var(--light-blue); 
+            margin: 0 0 15px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            gap: 12px; 
+            font-weight: bold; 
         }
-        h2::before, h2::after { content: ""; width: 20px; height: 1px; background: rgba(255, 255, 255, 0.3); }
+        h2::before, h2::after { 
+            content: ""; 
+            width: 25px; 
+            height: 1px; 
+            background: var(--light-blue);
+        }
 
         .addr-box { 
-            background: rgba(255, 255, 255, 0.08); padding: 16px; border-radius: 14px; 
-            cursor: pointer; margin-bottom: 12px; border: 1px solid rgba(255, 255, 255, 0.12);
+            background: rgba(255, 255, 255, 0.05); 
+            padding: 14px; 
+            border-radius: 12px; 
+            margin-bottom: 10px; 
+            cursor: pointer; 
+            border: 1px solid rgba(255,255,255,0.08); 
+            transition: all 0.2s; 
+        }
+        .addr-box:active { 
+            background: rgba(255, 255, 255, 0.1); 
+            transform: scale(0.98); 
         }
         .addr-box span { 
-            font-size: 0.8rem; opacity: 0.6; display: block; margin-bottom: 4px; 
-            color: #fff; /* 移除特定颜色 */
+            font-size: 0.75rem; 
+            color: var(--light-blue); 
+            display: block; 
+            margin-bottom: 3px; 
         }
-        .addr-box strong { color: var(--accent-yellow); font-family: monospace; font-size: 1.2rem; }
+        .addr-box strong { 
+            color: var(--accent-yellow); 
+            font-size: 1.15rem; 
+            font-family: monospace; 
+        }
 
         .comm-row { 
-            display: flex; justify-content: space-between; align-items: center; 
-            background: rgba(255, 255, 255, 0.08); padding: 14px 16px; border-radius: 14px; 
-            color: inherit; margin-bottom: 8px; font-size: 0.9rem; border: 1px solid rgba(255, 255, 255, 0.12);
+            display: flex; 
+            justify-content: space-between; 
+            padding: 12px 15px; 
+            background: rgba(255,255,255,0.07); 
+            border-radius: 10px; 
+            margin-bottom: 8px; 
+            font-size: 0.9rem; 
+            border: 1px solid rgba(255,255,255,0.05); 
+        }
+        .comm-row span:first-child { 
+            font-weight: bold; 
+            color: rgba(255,255,255,0.9); 
+        }
+        .comm-row span:last-child { 
+            color: var(--light-blue); 
+            font-weight: bold; 
         }
         
         .btn-join { 
-            background: linear-gradient(135deg, rgba(107, 164, 255, 0.9), rgba(90, 141, 233, 0.9)); 
-            color: #fff; padding: 16px; border-radius: 18px; display: block; font-weight: 700; margin-top: 10px;
+            background: linear-gradient(135deg, #6ba4ff, #4a86e9); 
+            padding: 16px; 
+            border-radius: 14px; 
+            font-weight: 800; 
+            font-size: 1rem; 
+            margin-top: 10px; 
+            display: block; 
+            box-shadow: 0 4px 15px rgba(74, 134, 233, 0.3); 
         }
 
         .disclaimer { 
-            background: rgba(255, 255, 255, 0.05); border-left: 4px solid var(--primary-blue); 
-            padding: 15px; text-align: left; border-radius: 8px; margin-bottom: 20px; font-size: 0.75rem;
+            border-left: 3px solid var(--light-blue); 
+            padding: 10px; 
+            text-align: left; 
+            background: var(--card-bg); 
+            border-radius: 4px; 
+            margin-bottom: 20px; 
+            font-size: 0.75rem; 
+            color: rgba(255,255,255,0.6); 
         }
 
         #timer { 
-            color: var(--accent-yellow); font-weight: 600; font-size: 1.1rem; 
-            padding: 10px 16px; background: rgba(246, 185, 59, 0.1); border-radius: 12px; display: inline-block; margin-bottom: 20px;
+            color: var(--accent-yellow); 
+            font-weight: bold; 
+            font-size: 1rem; 
+            padding: 8px 16px; 
+            background: var(--card-bg); 
+            border: 1px solid var(--glass-border); 
+            border-radius: 10px; 
+            display: inline-block; 
+            margin-bottom: 30px; 
         }
-        
-        /* 底部 CDN 排版优化 */
+
         .footer-info { 
-            font-size: 0.7rem; color: rgba(255, 255, 255, 0.5);
-            border-top: 1px solid rgba(255, 255, 255, 0.1); padding: 20px 0;
-            line-height: 1.6;
+            font-size: 0.72rem; 
+            color: var(--footer-gray); 
+            border-top: 1px solid rgba(255,255,255,0.1); 
+            padding: 25px 10px 10px; 
+            line-height: 1.6; 
         }
-        .cdn-container {
-            margin-top: 10px; display: flex; flex-direction: column; gap: 4px;
+        .cdn-info { 
+            margin-top: 5px; 
+            color: var(--footer-gray); 
+            opacity: 0.8; 
         }
-        .cdn-title { font-weight: bold; color: rgba(255, 255, 255, 0.7); margin-bottom: 2px; }
 
         #toast { 
-            visibility: hidden; position: fixed; top: 60px; left: 50%; transform: translateX(-50%); 
-            background: rgba(0, 0, 0, 0.8); color: #fff; padding: 10px 20px; border-radius: 10px; z-index: 10000;
+            visibility: hidden; 
+            position: fixed; 
+            top: 40px; 
+            left: 50%; 
+            transform: translateX(-50%); 
+            background: #222; 
+            color: #fff; 
+            padding: 8px 20px; 
+            border-radius: 20px; 
+            z-index: 10002; 
+            font-size: 0.8rem; 
         }
-        #toast.show { visibility: visible; animation: fadeInOut 1.5s; }
-        
-        @keyframes fadeInOut {
-            0%, 100% { opacity: 0; transform: translateX(-50%) translateY(-10px); }
-            20%, 80% { opacity: 1; transform: translateX(-50%) translateY(0); }
+        #toast.show { 
+            visibility: visible; 
+            animation: fadeInOut 1.5s; 
         }
-
-        @media (max-width: 480px) {
-            #player { bottom: 80px; }
-            h1 { font-size: 1.8rem; }
+        @keyframes fadeInOut { 
+            0%,100% {opacity:0;} 
+            20%,80% {opacity:1;} 
         }
     </style>
 </head>
-<body id="mainBody">
+<body>
 
-<div class="bg-container"></div>
+<!-- 背景锁定容器 -->
+<div class="background-container"></div>
 <div class="bg-overlay"></div>
 <div id="toast">已复制</div>
 
-<button class="hide-btn" onclick="toggleUI()">
+<button class="hide-btn" onclick="document.body.classList.toggle('hide-ui')">
     <svg viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
 </button>
 
 <div id="player" class="ui-element">
-    <div class="player-content">
-        <div class="cd-box" onclick="toggleDrawer()">
-            <svg viewBox="0 0 24 24"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>
+    <div class="cd-box" id="toggleBtn" onclick="toggleExpand()">
+        <svg viewBox="0 0 24 24"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>
+    </div>
+    
+    <div class="inner-ui">
+        <div class="m-info">
+            <span class="m-title" id="mName">正在初始化...</span>
         </div>
-        <div class="inner-ctrl">
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
-                <span class="m-title" id="mName">载入中...</span>
-                <span class="m-time"><span id="cTime">00:00</span> / <span id="tTime">00:00</span></span>
+        
+        <div class="progress-container" onclick="seek(event)">
+            <div class="p-bg">
+                <div class="p-fill" id="pBar"></div>
             </div>
-            <div style="display:flex; align-items:center;">
-                <div class="ctrl-btns">
-                    <button onclick="prevTrack()"><svg viewBox="0 0 24 24"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg></button>
-                    <button onclick="toggleMusic()">
-                        <svg id="playIco" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-                        <svg id="pauseIco" style="display:none;" viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
-                    </button>
-                    <button onclick="nextTrack()"><svg viewBox="0 0 24 24"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg></button>
-                </div>
-                <div class="p-bg" onclick="seek(event)" id="pWrap"><div class="p-fill" id="pBar"></div></div>
+        </div>
+        
+        <div class="ctrl-row">
+            <div class="ctrl-btns">
+                <button onclick="prevTrack()"><svg viewBox="0 0 24 24"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg></button>
+                <button onclick="toggleMusic()">
+                    <svg id="playIco" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                    <svg id="pauseIco" style="display:none;" viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+                </button>
+                <button onclick="nextTrack()"><svg viewBox="0 0 24 24"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg></button>
             </div>
+            <div class="m-time"><span id="cTime">00:00</span> / <span id="tTime">00:00</span></div>
         </div>
     </div>
     <audio id="audio"></audio>
 </div>
 
 <div class="wrapper ui-element">
-    <div class="server-icon" style="background-image: var(--server-icon-url);"></div>
+    <div class="server-icon"></div>
     <h1>HAGo Server</h1>
-    <div class="version-info">9 周目 | 1.18.x - 1.21.x | Java 离线服</div>
+    <div class="version-info">9 周目 | 1.18.x - 1.21.x | 离线服</div>
 
     <div class="card">
         <h2>关于我们</h2>
-        <p style="margin:0; font-size:0.95rem; line-height: 1.7; opacity: 0.9;">始于 2022 年 6 月 13 日 <br> 由热爱 MC 的少年共同创建<br> 目前已开启 9 周目 欢迎加入</p>
+        <div class="about-text">
+            始于 2022 年 6 月 13 日<br>
+            由热爱 MC 的少年共同创建<br>
+            目前已开启 9 周目 欢迎加入
+        </div>
     </div>
 
     <div class="card">
         <h2>连接地址</h2>
-        <div class="addr-box" onclick="copy('mc.qianxin520.xyz')">
-            <span>主线路</span>
-            <strong>mc.qianxin520.xyz</strong>
-        </div>
-        <div class="addr-box" onclick="copy('mc.520pro.top')">
-            <span>副线路</span>
-            <strong>mc.520pro.top</strong>
-        </div>
+        <div class="addr-box" onclick="copy('mc.qianxin520.xyz')"><span>上线地址</span><strong>mc.qianxin520.xyz</strong></div>
+        <div class="addr-box" onclick="copy('mc.520pro.top')"><span>副线路地址</span><strong>mc.520pro.top</strong></div>
     </div>
 
     <div class="card">
         <h2>官方社区</h2>
         <div class="comm-list">
-            <div class="comm-row"><span>官方 QQ 交流群</span><span style="color:var(--accent-yellow); font-weight:600;">771976804</span></div>
-            <a href="https://kdocs.cn/l/cgWcf35aLjPg" target="_blank" class="comm-row"><span>服务器详细文档</span><span>点击跳转</span></a>
+            <div class="comm-row"><span>官方 QQ 交流群</span><span style="color:var(--accent-yellow)">771976804</span></div>
+            <a href="https://kdocs.cn/l/cgWcf35aLjPg" target="_blank" class="comm-row"><span>服务器详细文档</span><span>点击查看</span></a>
+            <a href="https://f.wps.cn/g/NB3cyCFf/" target="_blank" class="comm-row"><span>建议反馈中心</span><span>点击进入</span></a>
         </div>
-        <a href="https://qm.qq.com/q/SFImYropqu" class="btn-join" target="_blank">立即加入 QQ 群聊</a>
+        <a href="https://qm.qq.com/q/SFImYropqu" class="btn-join" target="_blank">立即加入玩家群聊</a>
     </div>
 
-    <footer>
-        <div class="disclaimer">
-            <strong style="display:block;margin-bottom:5px;">免责声明 / DISCLAIMER</strong>
-            <p style="margin:0;line-height:1.4;">本页面背景图由第三方接口随机生成，展示内容不代表本站立场。如遇不适内容请刷新页面。</p>
+    <div class="disclaimer">
+        免责声明：<br>
+        本页面背景图由第三方接口随机生成,展示内容不代表本站立场<br>
+        如遇不适内容请刷新页面
+    </div>
+
+    <div id="timer">00 天 00 时 00 分 00 秒</div>
+
+    <footer class="footer-info">
+        <div style="color: var(--footer-gray);">Powered by GitHub & Acofork API</div>
+        <div class="cdn-info" style="color: var(--footer-gray);"><br>
+        CDN 提供<br>
+        Alibaba ESA / Cloudflare / Tencent EdgeOne
         </div>
-        <div id="timer">00 天 00 时 00 分 00 秒</div>
-        
-        <div class="footer-info">
-            <div>Powered by GitHub & Acofork API</div>
-            <div class="cdn-container">
-                <div class="cdn-title">CDN 提供商</div>
-                <div>Alibaba Cloud ESA / Cloudflare</div>
-                <div>Tencent Cloud EdgeOne</div>
-            </div>
-            <div style="margin-top:10px; opacity:0.3;">© 2022-2026 HAGo Server Team</div>
-        </div>
+        <div style="margin-top:15px; color: var(--footer-gray);">© 2022-2026 HAGo Server Team</div>
     </footer>
 </div>
 
 <script>
-    // 基础控制
-    function toggleUI() { document.body.classList.toggle('hide-ui'); }
-    function toggleDrawer() { document.getElementById("player").classList.toggle('expanded'); }
-
-    // 播放器逻辑
+    // 播放器核心变量
+    const audio = document.getElementById("audio");
+    const pBar = document.getElementById('pBar');
+    const player = document.getElementById('player');
+    
+    // 播放列表
     const playlist = [
         { name: "雨爱", url: "https://raw.githubusercontent.com/ERX399/HAGo-Server/main/%E9%9F%B3%E4%B9%90/%E9%9B%A8%E7%88%B1.mp3" },
         { name: "星茶会", url: "https://raw.githubusercontent.com/ERX399/HAGo-Server/main/%E9%9F%B3%E4%B9%90/%E6%98%9F%E8%8C%B6%E4%BC%9A.mp3" },
         { name: "带我走", url: "https://raw.githubusercontent.com/ERX399/HAGo-Server/main/%E9%9F%B3%E4%B9%90/%E5%B8%A6%E6%88%91%E8%B5%B0.mp3" }
     ];
+    
+    // 播放器状态
     let currentIndex = Math.floor(Math.random() * playlist.length);
-    const audio = document.getElementById("audio");
-    const mName = document.getElementById("mName");
     let isPlaying = false;
+    let isInitialized = false;
 
-    function loadTrack(idx) {
-        currentIndex = (idx + playlist.length) % playlist.length;
-        audio.src = playlist[currentIndex].url;
-        mName.innerText = playlist[currentIndex].name;
+    // 播放器展开/收起
+    function toggleExpand() {
+        player.classList.toggle('expanded');
     }
 
-    function toggleMusic() {
-        if (!audio.src) loadTrack(currentIndex);
-        if (audio.paused) {
-            audio.play().then(() => { updateIco(true); isPlaying = true; });
-        } else {
-            audio.pause(); updateIco(false); isPlaying = false;
+    // 加载并播放指定索引的歌曲
+    function loadTrack(index) {
+        // 确保索引在范围内
+        currentIndex = (index + playlist.length) % playlist.length;
+        
+        // 更新歌曲名称
+        document.getElementById("mName").innerText = playlist[currentIndex].name;
+        
+        // 设置音频源
+        audio.src = playlist[currentIndex].url;
+        
+        // 预加载音频
+        audio.load();
+        
+        // 重置进度
+        pBar.style.width = '0%';
+        document.getElementById('cTime').innerText = '00:00';
+        document.getElementById('tTime').innerText = '00:00';
+        
+        // 如果之前正在播放，继续播放
+        if (isPlaying) {
+            audio.play().then(() => {
+                updateIco(true);
+            }).catch(e => {
+                console.log("自动播放失败:", e);
+                isPlaying = false;
+                updateIco(false);
+            });
         }
     }
 
-    function nextTrack() { loadTrack(currentIndex + 1); if(isPlaying) audio.play(); }
-    function prevTrack() { loadTrack(currentIndex - 1); if(isPlaying) audio.play(); }
+    // 播放/暂停音乐
+    function toggleMusic() {
+        if (!audio.src || audio.src === '') {
+            loadTrack(currentIndex);
+        }
+        
+        if (audio.paused) {
+            audio.play().then(() => {
+                isPlaying = true;
+                updateIco(true);
+            }).catch(e => {
+                console.log("播放失败:", e);
+                // 尝试重新加载音频
+                audio.load();
+                audio.play().then(() => {
+                    isPlaying = true;
+                    updateIco(true);
+                }).catch(e2 => {
+                    console.log("再次播放失败:", e2);
+                });
+            });
+        } else {
+            audio.pause();
+            isPlaying = false;
+            updateIco(false);
+        }
+    }
+
+    // 下一首
+    function nextTrack() { 
+        loadTrack(currentIndex + 1); 
+    }
+    
+    // 上一首
+    function prevTrack() { 
+        loadTrack(currentIndex - 1); 
+    }
+    
+    // 更新播放按钮图标
     function updateIco(p) {
         document.getElementById('playIco').style.display = p ? 'none' : 'block';
         document.getElementById('pauseIco').style.display = p ? 'block' : 'none';
     }
 
-    audio.ontimeupdate = () => {
-        if (audio.duration) {
-            const cur = audio.currentTime, dur = audio.duration;
-            document.getElementById('pBar').style.width = (cur/dur*100) + "%";
-            document.getElementById('cTime').innerText = fmtT(cur);
-            document.getElementById('tTime').innerText = fmtT(dur);
-        }
-    };
-    audio.onended = () => nextTrack();
-    const fmtT = (s) => {
-        let m = Math.floor(s/60), sec = Math.floor(s%60);
-        return (m<10?"0"+m:m)+":"+(sec<10?"0"+sec:sec);
-    };
-    function seek(e) {
-        const rect = document.getElementById('pWrap').getBoundingClientRect();
-        audio.currentTime = ((e.clientX - rect.left) / rect.width) * audio.duration;
+    // 格式化时间为 mm:ss
+    function formatTime(seconds) {
+        if (isNaN(seconds) || seconds === Infinity) return "00:00";
+        
+        const mins = Math.floor(seconds / 60);
+        const secs = Math.floor(seconds % 60);
+        return `${mins < 10 ? '0' + mins : mins}:${secs < 10 ? '0' + secs : secs}`;
     }
 
-    // 运行时间
+    // 更新播放进度和时间
+    function updateProgress() {
+        if (audio.duration) {
+            const currentTime = audio.currentTime;
+            const duration = audio.duration;
+            const progressPercent = (currentTime / duration) * 100;
+            
+            pBar.style.width = `${progressPercent}%`;
+            document.getElementById('cTime').innerText = formatTime(currentTime);
+            document.getElementById('tTime').innerText = formatTime(duration);
+        }
+    }
+    
+    // 点击进度条跳转
+    function seek(event) {
+        if (!audio.duration) return;
+        
+        const progressBar = event.currentTarget;
+        const clickPosition = event.offsetX;
+        const barWidth = progressBar.offsetWidth;
+        const seekTime = (clickPosition / barWidth) * audio.duration;
+        
+        audio.currentTime = seekTime;
+    }
+    
+    // 更新总时长
+    function updateTotalTime() {
+        if (audio.duration && !isNaN(audio.duration)) {
+            document.getElementById('tTime').innerText = formatTime(audio.duration);
+        }
+    }
+    
+    // 初始化音频事件监听
+    function initAudioEvents() {
+        // 时间更新事件
+        audio.addEventListener('timeupdate', updateProgress);
+        
+        // 音频元数据加载完成
+        audio.addEventListener('loadedmetadata', updateTotalTime);
+        
+        // 音频播放结束
+        audio.addEventListener('ended', function() {
+            nextTrack();
+        });
+        
+        // 音频加载错误
+        audio.addEventListener('error', function(e) {
+            console.error("音频加载错误:", e);
+            document.getElementById("mName").innerText = "音频加载失败";
+        });
+    }
+
+    // 更新服务器运行时间
     function updateTimer() {
         const start = new Date('2022-06-13T00:00:00').getTime();
-        const now = new Date().getTime();
-        const diff = now - start;
+        const diff = new Date().getTime() - start;
         const d = Math.floor(diff / 86400000);
         const h = Math.floor((diff % 86400000) / 3600000);
         const m = Math.floor((diff % 3600000) / 60000);
         const s = Math.floor((diff % 60000) / 1000);
-        document.getElementById('timer').innerText = `${d} 天 ${h<10?'0'+h:h} 时 ${m<10?'0'+m:m} 分 ${s<10?'0'+s:s} 秒`;
+        document.getElementById('timer').innerText = `${d} 天 ${h} 时 ${m} 分 ${s} 秒`;
     }
-    setInterval(updateTimer, 1000);
 
-    // 复制功能
+    // 复制文本到剪贴板
     function copy(t) {
         navigator.clipboard.writeText(t).then(() => {
+            const toast = document.getElementById('toast');
+            toast.textContent = '已复制: ' + t;
+            toast.className = 'show';
+            setTimeout(() => toast.className = '', 1500);
+        }).catch(err => {
+            console.log('复制失败:', err);
+            // 备用复制方法
+            const textArea = document.createElement('textarea');
+            textArea.value = t;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+            
             const toast = document.getElementById('toast');
             toast.textContent = '已复制: ' + t;
             toast.className = 'show';
@@ -362,22 +702,31 @@
         });
     }
 
-    // 适配与初始化
-    function adjustPlayerPosition() {
-        const p = document.getElementById('player');
-        p.style.bottom = window.innerHeight < 700 ? "80px" : "100px";
-    }
-
-    window.onload = () => {
+    // 初始化
+    function init() {
+        // 初始化音频事件
+        initAudioEvents();
+        
+        // 加载随机曲目
         loadTrack(currentIndex);
+        
+        // 启动服务器运行时间计时器
+        setInterval(updateTimer, 1000);
         updateTimer();
-        adjustPlayerPosition();
-    };
-    window.onresize = adjustPlayerPosition;
-    document.addEventListener('click', (e) => {
-        const p = document.getElementById('player');
-        if (!p.contains(e.target)) p.classList.remove('expanded');
-    });
+        
+        // 点击页面其他区域收起播放器
+        document.addEventListener('click', (e) => {
+            if (!player.contains(e.target) && player.classList.contains('expanded')) {
+                toggleExpand();
+            }
+        });
+        
+        // 标记为已初始化
+        isInitialized = true;
+    }
+    
+    // 页面加载完成后初始化
+    window.addEventListener('DOMContentLoaded', init);
 </script>
 </body>
 </html>
