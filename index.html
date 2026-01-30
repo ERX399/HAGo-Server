@@ -22,10 +22,9 @@
             margin: 0; 
             overflow-x: hidden; 
             font-family: -apple-system, sans-serif; 
-            overflow-y: auto; /* 允许垂直滚动 */
+            overflow-y: auto; 
         }
         
-        /* 背景锁定解决方案 */
         .background-container {
             position: fixed;
             top: 0;
@@ -46,8 +45,8 @@
             background-image: var(--dynamic-bg);
             background-size: cover;
             background-position: center;
-            background-attachment: fixed; /* 锁定背景图 */
-            will-change: transform; /* 优化性能 */
+            background-attachment: fixed; 
+            will-change: transform; 
         }
         
         body { 
@@ -420,7 +419,6 @@
 </head>
 <body>
 
-<!-- 背景锁定容器 -->
 <div class="background-container"></div>
 <div class="bg-overlay"></div>
 <div id="toast">已复制</div>
@@ -509,79 +507,51 @@
 </div>
 
 <script>
-    // 播放器核心变量
     const audio = document.getElementById("audio");
     const pBar = document.getElementById('pBar');
     const player = document.getElementById('player');
     
-    // 播放列表
     const playlist = [
-        { name: "雨爱", url: "https://raw.githubusercontent.com/ERX399/HAGo-Server/main/%E9%9F%B3%E4%B9%90/%E9%9B%A8%E7%88%B1.mp3" },
         { name: "星茶会", url: "https://raw.githubusercontent.com/ERX399/HAGo-Server/main/%E9%9F%B3%E4%B9%90/%E6%98%9F%E8%8C%B6%E4%BC%9A.mp3" },
+        { name: "雨爱", url: "https://raw.githubusercontent.com/ERX399/HAGo-Server/main/%E9%9F%B3%E4%B9%90/%E9%9B%A8%E7%88%B1.mp3" },
         { name: "带我走", url: "https://raw.githubusercontent.com/ERX399/HAGo-Server/main/%E9%9F%B3%E4%B9%90/%E5%B8%A6%E6%88%91%E8%B5%B0.mp3" }
     ];
     
-    // 播放器状态
-    let currentIndex = Math.floor(Math.random() * playlist.length);
+    let currentIndex = 0;
     let isPlaying = false;
-    let isInitialized = false;
 
-    // 播放器展开/收起
     function toggleExpand() {
         player.classList.toggle('expanded');
     }
 
-    // 加载并播放指定索引的歌曲
     function loadTrack(index) {
-        // 确保索引在范围内
         currentIndex = (index + playlist.length) % playlist.length;
-        
-        // 更新歌曲名称
         document.getElementById("mName").innerText = playlist[currentIndex].name;
-        
-        // 设置音频源
         audio.src = playlist[currentIndex].url;
-        
-        // 预加载音频
         audio.load();
-        
-        // 重置进度
         pBar.style.width = '0%';
         document.getElementById('cTime').innerText = '00:00';
         document.getElementById('tTime').innerText = '00:00';
-        
-        // 如果之前正在播放，继续播放
-        if (isPlaying) {
-            audio.play().then(() => {
-                updateIco(true);
-            }).catch(e => {
-                console.log("自动播放失败:", e);
-                isPlaying = false;
-                updateIco(false);
-            });
-        }
+        if (isPlaying) audio.play().then(() => updateIco(true)).catch(e => {
+            console.log("自动播放失败:", e);
+            isPlaying = false;
+            updateIco(false);
+        });
     }
 
-    // 播放/暂停音乐
     function toggleMusic() {
-        if (!audio.src || audio.src === '') {
-            loadTrack(currentIndex);
-        }
-        
+        if (!audio.src || audio.src === '') loadTrack(currentIndex);
         if (audio.paused) {
             audio.play().then(() => {
                 isPlaying = true;
                 updateIco(true);
             }).catch(e => {
                 console.log("播放失败:", e);
-                // 尝试重新加载音频
                 audio.load();
                 audio.play().then(() => {
                     isPlaying = true;
                     updateIco(true);
-                }).catch(e2 => {
-                    console.log("再次播放失败:", e2);
-                });
+                }).catch(e2 => console.log("再次播放失败:", e2));
             });
         } else {
             audio.pause();
@@ -590,84 +560,52 @@
         }
     }
 
-    // 下一首
-    function nextTrack() { 
-        loadTrack(currentIndex + 1); 
-    }
+    function nextTrack() { loadTrack(currentIndex + 1); }
+    function prevTrack() { loadTrack(currentIndex - 1); }
     
-    // 上一首
-    function prevTrack() { 
-        loadTrack(currentIndex - 1); 
-    }
-    
-    // 更新播放按钮图标
     function updateIco(p) {
         document.getElementById('playIco').style.display = p ? 'none' : 'block';
         document.getElementById('pauseIco').style.display = p ? 'block' : 'none';
     }
 
-    // 格式化时间为 mm:ss
     function formatTime(seconds) {
         if (isNaN(seconds) || seconds === Infinity) return "00:00";
-        
         const mins = Math.floor(seconds / 60);
         const secs = Math.floor(seconds % 60);
         return `${mins < 10 ? '0' + mins : mins}:${secs < 10 ? '0' + secs : secs}`;
     }
 
-    // 更新播放进度和时间
     function updateProgress() {
         if (audio.duration) {
             const currentTime = audio.currentTime;
             const duration = audio.duration;
-            const progressPercent = (currentTime / duration) * 100;
-            
-            pBar.style.width = `${progressPercent}%`;
+            pBar.style.width = `${(currentTime / duration) * 100}%`;
             document.getElementById('cTime').innerText = formatTime(currentTime);
             document.getElementById('tTime').innerText = formatTime(duration);
         }
     }
     
-    // 点击进度条跳转
     function seek(event) {
         if (!audio.duration) return;
-        
-        const progressBar = event.currentTarget;
         const clickPosition = event.offsetX;
-        const barWidth = progressBar.offsetWidth;
-        const seekTime = (clickPosition / barWidth) * audio.duration;
-        
-        audio.currentTime = seekTime;
+        const barWidth = event.currentTarget.offsetWidth;
+        audio.currentTime = (clickPosition / barWidth) * audio.duration;
     }
     
-    // 更新总时长
     function updateTotalTime() {
         if (audio.duration && !isNaN(audio.duration)) {
             document.getElementById('tTime').innerText = formatTime(audio.duration);
         }
     }
     
-    // 初始化音频事件监听
-    function initAudioEvents() {
-        // 时间更新事件
-        audio.addEventListener('timeupdate', updateProgress);
-        
-        // 音频元数据加载完成
-        audio.addEventListener('loadedmetadata', updateTotalTime);
-        
-        // 音频播放结束
-        audio.addEventListener('ended', function() {
-            nextTrack();
-        });
-        
-        // 音频加载错误
-        audio.addEventListener('error', function(e) {
-            console.error("音频加载错误:", e);
-            document.getElementById("mName").innerText = "音频加载失败";
-        });
-    }
+    audio.addEventListener('timeupdate', updateProgress);
+    audio.addEventListener('loadedmetadata', updateTotalTime);
+    audio.addEventListener('ended', () => nextTrack());
+    audio.addEventListener('error', e => {
+        console.error("音频加载错误:", e);
+        document.getElementById("mName").innerText = "音频加载失败";
+    });
 
-    // 更新服务器运行时间
     function updateTimer() {
         const start = new Date('2022-06-13T00:00:00').getTime();
         const diff = new Date().getTime() - start;
@@ -678,7 +616,6 @@
         document.getElementById('timer').innerText = `${d} 天 ${h} 时 ${m} 分 ${s} 秒`;
     }
 
-    // 复制文本到剪贴板
     function copy(t) {
         navigator.clipboard.writeText(t).then(() => {
             const toast = document.getElementById('toast');
@@ -687,14 +624,12 @@
             setTimeout(() => toast.className = '', 1500);
         }).catch(err => {
             console.log('复制失败:', err);
-            // 备用复制方法
             const textArea = document.createElement('textarea');
             textArea.value = t;
             document.body.appendChild(textArea);
             textArea.select();
             document.execCommand('copy');
             document.body.removeChild(textArea);
-            
             const toast = document.getElementById('toast');
             toast.textContent = '已复制: ' + t;
             toast.className = 'show';
@@ -702,30 +637,17 @@
         });
     }
 
-    // 初始化
     function init() {
-        // 初始化音频事件
-        initAudioEvents();
-        
-        // 加载随机曲目
-        loadTrack(currentIndex);
-        
-        // 启动服务器运行时间计时器
+        loadTrack(0);
         setInterval(updateTimer, 1000);
         updateTimer();
-        
-        // 点击页面其他区域收起播放器
         document.addEventListener('click', (e) => {
             if (!player.contains(e.target) && player.classList.contains('expanded')) {
                 toggleExpand();
             }
         });
-        
-        // 标记为已初始化
-        isInitialized = true;
     }
     
-    // 页面加载完成后初始化
     window.addEventListener('DOMContentLoaded', init);
 </script>
 </body>
